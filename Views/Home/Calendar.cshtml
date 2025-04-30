@@ -1,0 +1,177 @@
+﻿@model IEnumerable<Zoom.Models.Meeting>
+
+@{
+    ViewData["Title"] = "Calendar";
+}
+
+<div class="container mt-2">
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="zoomFilter" class="form-label">Filter by Zoom Account:</label>
+            <select id="zoomFilter" class="form-control">
+                <option value="all">All</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="calendar"></div>
+</div>
+
+<style>
+    #calendar {
+        background-color: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .fc-daygrid-day {
+        border: 1px solid #ddd;
+    }
+
+    .fc-event {
+        font-size: 14px;
+        font-weight: bold;
+    }
+</style>
+
+@section Scripts {
+    <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const calendarEl = document.getElementById('calendar');
+                const zoomFilter = document.getElementById('zoomFilter');
+                let selectedMeetingId = null;
+
+                const zoomAccountsUrl = '@Url.Action("GetZoomAccounts", "Home")';
+                const cancelMeetingUrl = '@Url.Action("CancelMeeting", "Home")';
+                const getCalendarEventsBaseUrl = '@Url.Action("GetCalendarEvents", "Home")';
+
+                function fetchAccounts() {
+                    fetch(zoomAccountsUrl)
+                        .then(response => response.json())
+                        .then(accounts => {
+                            accounts.forEach(account => {
+                                const option = document.createElement("option");
+                                option.value = account;
+                                option.textContent = account;
+                                zoomFilter.appendChild(option);
+                            });
+                        });
+                }
+
+                function showMeetingDetail(event) {
+                    const start = new Date(event.start).toLocaleString();
+                    const end = event.end ? new Date(event.end).toLocaleString() : "-";
+                    const startUrl = event.extendedProps.startUrl;
+                    const joinUrl = event.extendedProps.joinUrl;
+                    const email = event.extendedProps.creatorEmail;
+                    const meetingId = event.id;
+                    selectedMeetingId = event.id;
+
+                    Swal.fire({
+                        title: `Topic: ${event.title}`,
+                        html: `
+                        <div style="text-align: left">
+                            <p><strong>Meeting ID:</strong> ${meetingId}</p>
+                            <p><strong>Creator Email:</strong> ${email}</p>
+                            <p><strong>Start:</strong> ${start}</p>
+                            <p><strong>End:</strong> ${end}</p>
+                            <p><strong>Start URL (Host Only):</strong><br>
+                                <a href="${startUrl}" target="_blank" class="swal2-confirm swal2-styled" style="margin-top: 5px;">Start Meeting</a>
+                            </p>
+                            <p><strong>Copy URL (Participant):</strong><br>
+                                <a href="${joinUrl}" target="_blank" class="swal2-confirm swal2-styled" style="margin-top: 5px;">Join Meeting</a><br>
+                                <button id="copyJoinUrlBtn" class="swal2-styled" style="margin-top: 8px; padding: 6px 12px; font-size: 14px;">
+                                    📋 Copy Join URL
+                                </button>
+                                <span id="copyFeedback" style="margin-left: 10px; font-size: 13px; color: green; display: none;">Copied!</span>
+                            </p>
+                        </div>
+                    `,
+                        showConfirmButton: false,
+                        showCancelButton: true,
+                        showDenyButton: true,
+                        denyButtonText: 'Cancel Meeting',
+                        cancelButtonText: 'Close',
+                        didOpen: () => {
+                            const copyBtn = document.getElementById("copyJoinUrlBtn");
+                            const feedback = document.getElementById("copyFeedback");
+
+                            copyBtn.addEventListener("click", () => {
+                                navigator.clipboard.writeText(joinUrl)
+                                    .then(() => {
+                                        feedback.style.display = 'inline';
+                                        feedback.textContent = 'Copied!';
+                                        feedback.style.color = 'green';
+                                        setTimeout(() => {
+                                            feedback.style.display = 'none';
+                                        }, 2000);
+                                    })
+                                    .catch(() => {
+                                        feedback.style.display = 'inline';
+                                        feedback.textContent = 'Failed to copy';
+                                        feedback.style.color = 'red';
+                                        setTimeout(() => {
+                                            feedback.style.display = 'none';
+                                        }, 2000);
+                                    });
+                            });
+                        }
+                    }).then(result => {
+                        if (result.isDenied) {
+                            confirmCancelMeeting();
+                        }
+                    });
+                }
+
+                function confirmCancelMeeting() {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This meeting will be cancelled!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, cancel it!',
+                        cancelButtonText: 'No, keep it'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`${cancelMeetingUrl}?meetingId=${selectedMeetingId}`, { method: 'POST' })
+                                .then(res => {
+                                    if (res.ok) {
+                                        Swal.fire('Cancelled!', 'The meeting has been cancelled.', 'success')
+                                            .then(() => location.reload());
+                                    } else {
+                                        Swal.fire('Error', 'Failed to cancel meeting.', 'error');
+                                    }
+                                });
+                        }
+                    });
+                }
+
+                function fetchEvents(zoomAccount) {
+                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        },
+                        events: getCalendarEventsBaseUrl + '?zoomAccount=' + zoomAccount,
+                        eventClick: function (info) {
+                            info.jsEvent.preventDefault();
+                            showMeetingDetail(info.event);
+                        }
+                    });
+
+                    calendar.render();
+                }
+
+                fetchAccounts();
+                fetchEvents("all");
+
+                zoomFilter.addEventListener("change", function () {
+                    fetchEvents(zoomFilter.value);
+                });
+            });
+    </script>
+   
+}

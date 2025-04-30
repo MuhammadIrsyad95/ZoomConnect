@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Meeting>
+@{
+    ViewData["Title"] = "List Meeting";
+}
+<div class="table-responsive" style="background-color: white; padding: 30px; border-radius: 8px;">
+    <table id="tableList" class="table table-hover table-striped table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Zoom ID</th>
+                <th>Passcode</th>
+                <th>Email</th>
+                <th>Zoom Account</th>
+                <th>Topic</th>
+                <th>Agenda</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Duration</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var meeting in Model)
+            {
+                <tr>
+                    <td>@meeting.ZoomId</td>
+                    <td>@meeting.Passcode</td>
+                    <td>@meeting.Email</td>
+                    <td>@meeting.ZoomAccount</td>
+                    <td>@meeting.Topic</td>
+                    <td>@meeting.Agenda</td>
+                    <td>@meeting.StartDate?.ToString("dd-MM-yyyy") @@@meeting.StartTime?.ToString(@"hh\:mm")</td>
+                    <td>@meeting.EndDate?.ToString("dd-MM-yyyy") @@@meeting.EndTime?.ToString(@"hh\:mm")</td>
+                    <td>@meeting.Duration</td>
+                    <td><a asp-action="LaunchMeeting" asp-controller="Home" asp-route-zoomID="@meeting.ZoomId" class="btn-sm btn-primary">Launch</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>

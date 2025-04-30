@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zoom Connect</title>
+    <link rel="icon" type="image/x-icon" href="~/images/Zone.png" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/account.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Zoom.styles.css" asp-append-version="true" />
+    <link href="~/app/css/toastr.css" rel="stylesheet" />
+    <link href="~/app/css/sweetalert2.min.css" rel="stylesheet" />
+ 
+    <style>
+        body {
+            background-image: url('@Url.Content("~/images/Supper Grey.png")');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Membuat background tetap dan tidak bisa digulir */
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .logo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 200px;
+        }
+
+        .account-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1; /* Memastikan konten utama mengisi ruang yang tersisa */
+            width: 100%;
+            padding: 2rem 0;
+            position: relative;
+            z-index: 1; /* Pastikan elemen ini tetap berada di atas latar belakang */
+        }
+
+        .account-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            opacity: .9;
+        }
+
+        @@media (max-width: 767px) {
+            .account-box {
+                padding: 20px;
+                max-width: 100%;
+            }
+        }
+
+        /* Logo Kalventis */
+        .logo-kalventis {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 150px; /* Ukuran logo Kalventis lebih kecil */
+            z-index: 9999;
+        }
+
+        /* Logo Zoom Connect 2 */
+       /*  .logo-zoom {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 100px; /* Ukuran logo Zoom Connect lebih kecil */
+            z-index: 9999;
+        } */
+     
+
+
+    </style>
+</head>
+<body>
+
+    <!-- Logo Kalventis di sudut kiri atas -->
+    <img src="~/images/Logo Kalventis Horizontal-01.png" alt="Logo Kalventis" class="logo-kalventis" />
+
+@*     <!-- Logo Zoom Connect 2 di sudut kanan atas -->
+    <img src="~/images/zoom connect 2.png" alt="Logo Zoom Connect 2" class="logo-zoom" /> *@
+
+    <div>
+        @RenderBody()
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>  <!-- FullCalendar JS -->
+    <script src="~/lib/moment/moment.min.js"></script>
+    <script src="~/lib/fullcalendar/main.js"></script>
+    <script src="~/app/js/select2.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/app/js/sweetalert2.all.min.js"></script>
+    <script src="~/app/js/datatables.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

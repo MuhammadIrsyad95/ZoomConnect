@@ -1,0 +1,137 @@
+﻿@model LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+<link rel="stylesheet" href="~/css/Account/login.css" />
+
+<style>
+    .login-card {
+        background-color: white;
+        border-radius: 20px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1); /* Lebih tajam bayangan */
+        display: flex;
+        flex-direction: row;
+        overflow: hidden;
+        width: 90%;
+        max-width: 850px;
+        min-height: 500px;
+        background: linear-gradient(145deg, #f2f2f2, #ffffff); /* Efek gradien agar lebih halus */
+    }
+
+    .login-left {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #fff;
+    }
+
+        .login-left h3 {
+            margin-bottom: 20px; /* Space between the heading and the form */
+        }
+
+        .login-left img {
+            width: auto;
+            max-width: 100%; /* Gambar lebih besar, sesuaikan dengan ukuran yang diinginkan */
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+    .login-right {
+        flex: 1;
+        background-color: #f5f6ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .login-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .btn-purple {
+        background-color: #6c63ff;
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 10px 20px;
+        transition: background-color 0.3s ease;
+        margin-top: 20px; /* Space above the login button */
+    }
+
+        .btn-purple:hover {
+            background-color: #5751e6;
+        }
+
+    .input-group {
+        margin-bottom: 15px; /* Add space between input fields */
+    }
+
+    .text-danger {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #dc3545;
+    }
+
+</style>
+
+<div class="account-container">
+    <div class="login-card">
+        <div class="login-left">
+            <div class="mb-4 text-start">
+                <img src="~/images/zoom connect 2.png" alt="Zoom Connect Logo" />
+            </div>
+            <h3 class="mb-4 text-start">
+                Sign in to start your session
+            </h3>
+
+            <form asp-action="Login" method="post">
+                <input type="hidden" id="baseUrl" name="BaseUrl" value="@ViewBag.BaseUrl" />
+
+                <!-- Username -->
+                <div class="input-group mb-3">
+                    <input asp-for="Email" class="form-control" placeholder="Username or email address" />
+                    <div class="input-group-append">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="input-group mb-3">
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+                    <div class="input-group-append">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div>
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="text-danger" style="margin-bottom:10px;">
+                            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                        </div>
+                    }
+                </div>
+
+                <!-- Button -->
+                <button type="submit" class="btn btn-purple w-100">Login</button>
+            </form>
+        </div>
+
+        <div class="login-right">
+            <img src="~/images/13298101_5150310.jpg" class="img-fluid" alt="Zoom illustration" />
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial.cshtml");
+    }
+}

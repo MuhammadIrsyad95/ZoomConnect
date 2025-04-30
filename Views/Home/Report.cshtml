@@ -1,0 +1,121 @@
+﻿@model IEnumerable<ParticipantApi>
+
+@{
+    ViewData["Title"] = "List Report";
+}
+<div>
+    <p class="mb-3 text-muted">
+        Enter the <strong>Meeting ID</strong> to retrieve the report. The creator's email will be pre-filled.
+    </p>
+
+
+
+    <form asp-action="GetReportList" method="post" onsubmit="return validateForm()">
+        <div class="d-flex align-items-center mb-2">
+            <label for="meetingID" class="me-2" style="width: 120px;">Meeting ID</label>
+            <input type="text" name="meetingID" class="form-control form-control-sm" style="width: 300px;" value="@ViewBag.MeetingID" />
+        </div>
+
+        <div class="d-flex align-items-center mb-2">
+            <label for="email" class="me-2" style="width: 120px;">Creator Email</label>
+            <input type="text"
+                   id="email"
+                   name="email"
+                   class="form-control form-control-sm"
+                   value="@ViewBag.Email"
+                   readonly
+                   style="width: 300px; background-color: #f0f0f0; color: #000;" />
+        </div>
+
+        <div class="d-flex justify-content-start">
+            <button type="submit" class="btn btn-primary btn-sm">Get Report Data</button>
+        </div>
+    </form>
+
+</div>
+
+
+
+
+<br />
+
+<!-- Tombol Download CSV dan Excel -->
+<div>
+    <button class="btn btn-success" onclick="downloadReport('xlsx')">Download Excel</button>
+    <button class="btn btn-info" onclick="downloadReport('csv')">Download CSV</button>
+</div>
+<br />
+
+<div class="table-responsive" style="background-color: white; padding: 10px; border-radius: 8px;">
+    <table class="table table-hover table-striped table-bordered" id="tableReport">
+        <thead class="table-light">
+            <tr>
+                <th>Name</th>
+                <th>User Email</th>
+                <th>JoinTime</th>
+                <th>LeaveTime</th>
+                <th>Duration</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var participant in Model)
+            {
+                <tr>
+                    <td>@participant.Name</td>
+                    <td>@participant.UserEmail</td>
+                    <td>@participant.JoinTime.ToString("dd-MM-yyyy @hh\\:mm")</td>
+                    <td>@participant.LeaveTime.ToString("dd-MM-yyyy @hh\\:mm")</td>
+                    <td>@participant.Duration</td>
+                    <td>@participant.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function validateForm() {
+            var meetingID = document.querySelector("input[name='meetingID']").value.trim();
+            var email = document.querySelector("input[name='email']").value.trim();
+
+            if (!meetingID || !email) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Missing Information',
+                    text: 'Please fill in both Meeting ID and Email before continuing.',
+                    confirmButtonColor: '#3085d6'
+                });
+                return false; // prevent form submission
+            }
+
+            return true;
+        }
+
+        function downloadReport(format) {
+            var meetingID = document.querySelector("input[name='meetingID']").value.trim();
+            var email = document.querySelector("input[name='email']").value.trim();
+
+            if (!meetingID || !email) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Missing Information',
+                    text: 'Please fill in both Meeting ID and Email before downloading.',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            var cacheKey = meetingID + "_" + email.toLowerCase();
+            var url = '/Home/DownloadReport?meetingID=' + meetingID +
+                '&email=' + encodeURIComponent(email) +
+                '&format=' + format +
+                '&cacheKey=' + cacheKey;
+
+            window.location.href = url;
+        }
+    </script>
+}
